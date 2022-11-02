@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import Global from '../Global';
+import { Navigate } from 'react-router-dom';
 
 class NuevoPersonaje extends Component {
     cajaNombre = React.createRef();
@@ -10,7 +11,8 @@ class NuevoPersonaje extends Component {
 
     state = {
         series : [],
-        statusSeries : false
+        statusSeries : false,
+        statusInsertado : false
     }
 
     generarSeries = () => {
@@ -23,20 +25,23 @@ class NuevoPersonaje extends Component {
         });
     }
 
-    insertarPersonaje = () => {
+    insertarPersonaje = (e) => {
+        e.preventDefault();
+
         var nombre = this.cajaNombre.current.value;
         var imagen = this.cajaImagen.current.value;
 
-        var url = Global.urlSeries + "";
+        var url = Global.urlSeries + "/api/Personajes";
         var miPersonaje = {
-            "idPersonaje": 0,
-            "nombre": nombre,
-            "imagen": imagen,
-            "idSerie": parseInt(this.getCurrentSerieID())
+            idPersonaje : 0,
+            nombre : nombre,
+            imagen : imagen,
+            idSerie : parseInt(this.getCurrentSerieID())
         }
-        var jsonPersonaje = JSON.stringify(miPersonaje);
-        axios.post(url, jsonPersonaje).then(response => {
-            console.log("Insertado con éxito");
+        axios.post(url, miPersonaje).then(response => {
+            this.setState({
+                statusInsertado : true
+            });
         });
     }
 
@@ -56,10 +61,13 @@ class NuevoPersonaje extends Component {
     }
 
     render() {
+        if (this.state.statusInsertado === true) {
+            return (<Navigate to={"/personajes/" + this.getCurrentSerieID()}/>)
+        }
         return (
             <div>
                 <h1 className='pb-2 pt-1 text-bg-dark'>Nuevo Personaje</h1>
-                <form onSubmit={this.insertarPersonaje} className='w-75 mx-auto mt-2'>
+                <form className='w-75 mx-auto mt-2'>
                     <label className='form-label'>Nombre:</label>
                     <input type='text' required className='form-control' ref={this.cajaNombre}/>
 
@@ -81,7 +89,7 @@ class NuevoPersonaje extends Component {
                         }
                     </select>
 
-                    <button className='btn btn-success my-3'>
+                    <button className='btn btn-success my-3' onClick={this.insertarPersonaje}>
                         Insertar Personaje
                     </button>
                 </form>
