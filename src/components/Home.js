@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/alt-text */
+
 import React, { Component } from 'react';
 import logoSerie from '../assets/images/series-tv.jpg';
 

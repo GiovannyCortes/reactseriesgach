@@ -127,7 +127,7 @@ class ModificarPersonaje extends Component {
 
                     <label>Seleccione un Personaje:</label>
                     <select ref={this.selectPersonajes} className='form-control' required onChange={this.mostrarPersonaje}>
-                    {
+                        {
                             this.state.statusPersonajes === true && (
                                 this.state.personajes.map((personaje, index) => {
                                     return(
