@@ -1,0 +1,93 @@
+/* eslint-disable no-unused-vars */
+import React, { Component } from 'react';
+import axios from 'axios';
+import Global from '../Global';
+
+class NuevoPersonaje extends Component {
+    cajaNombre = React.createRef();
+    cajaImagen = React.createRef();
+    selectSeries = React.createRef();
+
+    state = {
+        series : [],
+        statusSeries : false
+    }
+
+    generarSeries = () => {
+        var url = Global.urlSeries + "/api/series";
+        axios.get(url).then(response => {
+            this.setState({
+                series : response.data,
+                statusSeries : true
+            });
+        });
+    }
+
+    insertarPersonaje = () => {
+        var nombre = this.cajaNombre.current.value;
+        var imagen = this.cajaImagen.current.value;
+
+        var url = Global.urlSeries + "";
+        var miPersonaje = {
+            "idPersonaje": 0,
+            "nombre": nombre,
+            "imagen": imagen,
+            "idSerie": parseInt(this.getCurrentSerieID())
+        }
+        var jsonPersonaje = JSON.stringify(miPersonaje);
+        axios.post(url, jsonPersonaje).then(response => {
+            console.log("Insertado con éxito");
+        });
+    }
+
+    getCurrentSerieID = () => {
+        var optionsSerie = this.selectSeries.current.options;
+        var selectIdSerie = ""; 
+        for (var optSerie of optionsSerie) {
+            if (optSerie.selected === true) {
+                selectIdSerie = optSerie.value;
+            }
+        }
+        return selectIdSerie;
+    }
+
+    componentDidMount = () => {
+        this.generarSeries();
+    }
+
+    render() {
+        return (
+            <div>
+                <h1 className='pb-2 pt-1 text-bg-dark'>Nuevo Personaje</h1>
+                <form onSubmit={this.insertarPersonaje} className='w-75 mx-auto mt-2'>
+                    <label className='form-label'>Nombre:</label>
+                    <input type='text' required className='form-control' ref={this.cajaNombre}/>
+
+                    <label className='form-label mt-2'>Imagen:</label>
+                    <input type='text' required className='form-control' ref={this.cajaImagen}/>
+
+                    <label className='form-label mt-2'>Serie:</label>
+                    <select ref={this.selectSeries} className='form-control' required>
+                        {
+                            this.state.statusSeries === true && (
+                                this.state.series.map((serie, index) => {
+                                    return(
+                                        <option key={serie.idSerie} value={serie.idSerie}>
+                                            {serie.nombre}
+                                        </option>
+                                    );
+                                })
+                            )
+                        }
+                    </select>
+
+                    <button className='btn btn-success my-3'>
+                        Insertar Personaje
+                    </button>
+                </form>
+            </div>
+        )
+    }
+}
+
+export default NuevoPersonaje;
